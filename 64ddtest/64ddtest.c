@@ -5,10 +5,17 @@
 #include <libdragon.h>
 
 #include "dd.h"
-#include "rtc_dd.h"
+#include "dd_rtc.h"
 
 static resolution_t res = RESOLUTION_320x240;
 static bitdepth_t bit = DEPTH_32_BPP;
+
+unsigned char year;
+unsigned char month;
+unsigned char day;
+unsigned char hour;
+unsigned char min;
+unsigned char sec;
 
 int main(void)
 {

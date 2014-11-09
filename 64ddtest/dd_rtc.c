@@ -5,7 +5,14 @@
 #include <libdragon.h>
 
 #include "dd.h"
-#include "rtc_dd.h"
+#include "dd_rtc.h"
+
+unsigned char year;
+unsigned char month;
+unsigned char day;
+unsigned char hour;
+unsigned char min;
+unsigned char sec;
 
 void getRTC_64dd(void)
 {

@@ -1,5 +1,5 @@
-#ifndef DISK_H
-#define DISK_H
+#ifndef DD_H
+#define DD_H
 
 //ASIC commands
 #define ASIC_NO_OPERATION          0x00000000
@@ -79,6 +79,7 @@
 #define LEO_STAT_NC_CHK        0x0000ffff
 
 #define LEO_STAT_WRITE_END     0x00000000
+
 
 //functions
 int detect64dd_ipl(void);
