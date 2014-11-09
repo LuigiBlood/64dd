@@ -4,84 +4,11 @@
 #include <stdint.h>
 #include <libdragon.h>
 
+#include "dd.h"
+#include "rtc_dd.h"
+
 static resolution_t res = RESOLUTION_320x240;
 static bitdepth_t bit = DEPTH_32_BPP;
-
-//64DD RTC
-static unsigned char year = 0;
-static unsigned char month = 0;
-static unsigned char day = 0;
-static unsigned char hour = 0;
-static unsigned char min = 0;
-static unsigned char sec = 0;
-
-int detect64dd_ipl(void)
-{
-    //Look at 0x9FF00 from the IPL.
-    uint32_t test = io_read(0x0609FF00);
-
-    //Check if the highest byte is 0xC3
-    test &= 0xFF000000;
-    if (test == 0xC3000000)
-	return 1;	//if yes, then retail 64DD is present (JPN)
-    else if (test == 0x04000000)
-	return 2;	//it has found a potential US 64DD.
-    else
-	return 0;	//if not, then there are no 64DD connected.
-}
-
-int detectdisk(void)
-{
-    uint32_t test = io_read(0x05000508);	//read status
-
-    test &= 0x01000000;		//mask disk status
-
-    if (test == 0x01000000)
-	return 1;	//disk found
-    else
-	return 0;	//disk not found
-}
-
-void wait64dd_ready(void)
-{
-    while ((io_read(0x05000508) & 0x00800000) == 0x00800000)
-    {
-	//DO NOTHING. JUST WAIT.
-    }
-}
-
-void getRTC_64dd(void)
-{
-    uint32_t temp;
-    wait64dd_ready(); //wait for 64DD to be ready
-
-    io_write(0x05000508, 0x00120000);	//request year and date
-    wait64dd_ready();
-    temp = io_read(0x05000500); //get data
-
-    year = (unsigned char)((temp & 0xFF000000) >> 24);
-    month = (unsigned char)((temp & 0x00FF0000) >> 16);
-    
-
-    wait64dd_ready(); //wait for 64DD to be ready
-
-    io_write(0x05000508, 0x00130000);	//request day and hour
-    wait64dd_ready();
-    temp = io_read(0x05000500); //get data
-
-    day = (unsigned char)((temp & 0xFF000000) >> 24);
-    hour = (unsigned char)((temp & 0x00FF0000) >> 16);
-
-
-    wait64dd_ready(); //wait for 64DD to be ready
-
-    io_write(0x05000508, 0x00140000);	//request min and sec
-    wait64dd_ready();
-    temp = io_read(0x05000500); //get data
-
-    min = (unsigned char)((temp & 0xFF000000) >> 24);
-    sec = (unsigned char)((temp & 0x00FF0000) >> 16);
-}
 
 int main(void)
 {
