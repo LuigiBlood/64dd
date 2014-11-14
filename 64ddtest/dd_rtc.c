@@ -16,11 +16,16 @@ unsigned char sec;
 
 void getRTC_64dd(void)
 {
-    uint32_t temp;
+    uint32_t temp, test;
     wait64dd_ready(); //wait for 64DD to be ready
 
-    io_write(ASIC_CMD, ASIC_READ_TIMER_YEAR);	//request year and date
-    wait64dd_ready();
+    test = io_read(ASIC_DATA);
+
+    io_write(ASIC_CMD, ASIC_READ_TIMER_YEAR);	//request year and month
+    while (test == io_read(ASIC_DATA))
+    {
+	//Do nothing, wait for the date to come
+    }
     temp = io_read(ASIC_DATA); //get data
 
     year = (unsigned char)((temp & 0xFF000000) >> 24);
@@ -29,8 +34,13 @@ void getRTC_64dd(void)
 
     wait64dd_ready(); //wait for 64DD to be ready
 
+    test = io_read(ASIC_DATA);
+
     io_write(ASIC_CMD, ASIC_READ_TIMER_DATE);	//request day and hour
-    wait64dd_ready();
+    while (test == io_read(ASIC_DATA))
+    {
+	//Do nothing, wait for the date to come
+    }
     temp = io_read(ASIC_DATA); //get data
 
     day = (unsigned char)((temp & 0xFF000000) >> 24);
@@ -39,8 +49,13 @@ void getRTC_64dd(void)
 
     wait64dd_ready(); //wait for 64DD to be ready
 
+    test = io_read(ASIC_DATA);
+
     io_write(ASIC_CMD, ASIC_READ_TIMER_MINUTE);	//request min and sec
-    wait64dd_ready();
+    while (test == io_read(ASIC_DATA))
+    {
+	//Do nothing, wait for the date to come
+    }
     temp = io_read(ASIC_DATA); //get data
 
     min = (unsigned char)((temp & 0xFF000000) >> 24);

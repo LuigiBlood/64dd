@@ -10,12 +10,15 @@
 static resolution_t res = RESOLUTION_320x240;
 static bitdepth_t bit = DEPTH_32_BPP;
 
-unsigned char year;
-unsigned char month;
-unsigned char day;
-unsigned char hour;
-unsigned char min;
-unsigned char sec;
+int detect_exppak(void)
+{
+    io_write(0x00200000, 0xAAAA5555);
+    uint32_t test = io_read(0x00200000);
+    if (test == 0xAAAA5555)
+	return 1;
+    else
+	return 0;
+}
 
 int main(void)
 {
@@ -43,7 +46,7 @@ int main(void)
         /* To do initialize routines */
         controller_scan();
 
-	printf("64dd_test by LuigiBlood\n\n");
+	printf("64dd_test2 by LuigiBlood\n\n");
 
 	switch (dd_present)
 	{
@@ -53,10 +56,17 @@ int main(void)
 	    case 2:
 		printf("Retail 64DD found (USA)\n\n");
 		break;
+	    case 3:
+		printf("Development 64DD found\n\n");
+		break;
 	    default:
 		printf("Retail 64DD NOT found\n\n");
 		break;
 	}
+
+	//Expansion Pack detection
+	if (detect_exppak())
+	    printf("Expansion Pak found!\n\n");
 
 	//NOTE: getRTC_64dd() IS PERFORMED ONLY ONCE.
 	//THE DATE WILL NOT UPDATE IN REALTIME.

@@ -19,7 +19,13 @@ int detect64dd_ipl(void)
     else if (test == 0x04000000)
 	return 2;	//it has found a potential US 64DD.
     else
-	return 0;	//if not, then there are no 64DD connected.
+    {
+	test = io_read(ASIC_ID_REG);
+	if (test == 0x00040000)
+	    return 3;
+	else
+	    return 0;	//if not, then there are no 64DD connected.
+    }
 }
 
 int detectdisk(void)

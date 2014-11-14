@@ -1,5 +1,5 @@
-#ifndef RTC_DD_H
-#define RTC_DD_H
+#ifndef DD_RTC_H
+#define DD_RTC_H
 
 //64DD RTC
 extern unsigned char year;
