@@ -33,4 +33,7 @@ copy: $(PROG_NAME).v64
 all: $(PROG_NAME).v64
 
 clean:
+	rm -f *.elf *.o *.bin
+
+clean-all:
 	rm -f *.v64 *.elf *.o *.bin
