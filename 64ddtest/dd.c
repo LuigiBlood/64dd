@@ -40,9 +40,17 @@ int detectdisk(void)
 	return 0;	//disk not found
 }
 
-void wait64dd_ready(void)
+void wait64dd_statusON(uint32_t STAT)
 {
-    while ((io_read(ASIC_STATUS) & LEO_STAT_BUSY) == LEO_STAT_BUSY)
+    while ((io_read(ASIC_STATUS) & STAT) != STAT)
+    {
+	//DO NOTHING. JUST WAIT.
+    }
+}
+
+void wait64dd_statusOFF(uint32_t STAT)
+{
+    while ((io_read(ASIC_STATUS) & STAT) == STAT)
     {
 	//DO NOTHING. JUST WAIT.
     }

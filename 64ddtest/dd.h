@@ -80,10 +80,14 @@
 
 #define LEO_STAT_WRITE_END     0x00000000
 
+//RESET
+#define ASIC_RESET_CODE        0xaaaa0000
+
 
 //functions
 int detect64dd_ipl(void);
 int detectdisk(void);
-void wait64dd_ready(void);
+void wait64dd_statusON(uint32_t STAT);
+void wait64dd_statusOFF(uint32_t STAT);
 
 #endif
