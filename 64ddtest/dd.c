@@ -78,7 +78,7 @@ void wait64dd_statusOFF(uint32_t STAT)
 uint32_t readDiskID(void)
 {
     uint32_t diskIDsector[60];
-    readDiskSectorLBA(15, 0, &diskIDsector);
+    readDiskSectorLBA(14, 0, &diskIDsector);
     return diskIDsector[0];
 }
 
@@ -107,7 +107,7 @@ void sendMSEQ(uint32_t secsize)
 
 void readDiskSectorLBA(uint8_t LBA, uint8_t sector, void * buffer)
 {
-    readDiskSector((LBA >> 1), sector + (ALL_SECS_PER_BLK * (LBA & 1)), buffer);
+    readDiskSector((LBA >> 1), (sector + (ALL_SECS_PER_BLK * (LBA & 1))), buffer);
 }
 
 void readDiskSector(uint8_t track, uint8_t sector, void * buffer)

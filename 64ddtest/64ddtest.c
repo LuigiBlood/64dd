@@ -108,7 +108,7 @@ int main(void)
 	//DATE: MM/DD/YY - HH:MM:SS
 	if (dd_present)
 	{
-	    //getRTC_64dd();
+	    getRTC_64dd();
 	    printf("DATE: %02x/%02x/%02x - %02x:%02x:%02x\n\n", month, day, year, hour, min, sec);
 	}
 
@@ -124,6 +124,7 @@ int main(void)
 		else
 		{
 		    printf("DISK NOT FOUND\n");
+		    emptydiskID();
 		}
 	}
 
@@ -135,9 +136,9 @@ int main(void)
 
         printf( "\nController 1 %spresent\n", (controllers & CONTROLLER_1_INSERTED) ? "" : "not " );
 
-        if( keys.c[0].A )
+        if( keys.c[0].A && (dd_present != 0) && (detectdisk() == 1))
         {
-            //printf("YOU PRESSED A");
+            printf("Reading Disk ID...");
 	    uint32_t idstuff = readDiskID();
 	    diskID[0] = (char)((idstuff & 0xFF000000) >> 24);
 	    diskID[1] = (char)((idstuff & 0x00FF0000) >> 16);
