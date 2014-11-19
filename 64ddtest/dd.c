@@ -77,7 +77,8 @@ void wait64dd_statusOFF(uint32_t STAT)
 
 uint32_t readDiskID(void)
 {
-    uint32_t diskIDsector[60];
+    uint32_t diskIDsector[60] __attribute__ ((aligned (8)));
+    diskIDsector[0] = 0x12345678; //TEST
     readDiskSectorLBA(14, 0, &diskIDsector);
     return diskIDsector[0];
 }
@@ -121,7 +122,7 @@ void readDiskSector(uint8_t track, uint8_t sector, void * buffer)
     if (getZonefromTrack(track) == 0xFF)
 	return;
 
-    uint32_t SecSize = (uint32_t)SecSizes[getZonefromTrack(track)];
+    uint32_t SecSize = (uint32_t)SecSizes[getZonefromTrack(track)] - 1;
 
     sendMSEQ(SecSize);	//Send MSEQ
     io_write(ASIC_HOST_SECBYTE, (SecSize << 16));
@@ -136,7 +137,11 @@ void readDiskSector(uint8_t track, uint8_t sector, void * buffer)
 	//Wait until BM is done
 
     if ((io_read(ASIC_BM_STATUS) & LEO_STAT_DATA_REQ) == LEO_STAT_DATA_REQ)
+    {
+	printf("DMA !!!\n");
+	console_render();
 	dma_read(buffer, (0xA0000000 | ASIC_SECTOR_BUFF), SecSize);
+    }
 }
 
 uint8_t getZonefromTrack(uint8_t track)

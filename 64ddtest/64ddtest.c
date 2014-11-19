@@ -118,7 +118,7 @@ int main(void)
 		if (detectdisk() == 1)
 		{
 			printf("DISK FOUND\n");
-			printf("DISK ID: %c%c%c%c", diskID[0], diskID[1], diskID[2], diskID[3]);
+			printf("DISK ID: %c%c%c%c\n", diskID[0], diskID[1], diskID[2], diskID[3]);
 			printf(" (0x%02x%02x%02x%02x)\n", diskID[0], diskID[1], diskID[2], diskID[3]);
 		}
 		else
