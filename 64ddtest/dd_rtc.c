@@ -26,7 +26,7 @@ void getRTC_64dd(void)
     year = (unsigned char)((temp & 0xFF000000) >> 24);
     month = (unsigned char)((temp & 0x00FF0000) >> 16);
     
-
+    io_write(ASIC_BM_CTL, BM_MECHA_INT_RESET);
     wait64dd_statusOFF(LEO_STAT_BUSY); //wait for 64DD to be ready
 
     io_write(ASIC_CMD, ASIC_READ_TIMER_DATE);	//request day and hour
@@ -36,7 +36,7 @@ void getRTC_64dd(void)
     day = (unsigned char)((temp & 0xFF000000) >> 24);
     hour = (unsigned char)((temp & 0x00FF0000) >> 16);
 
-
+    io_write(ASIC_BM_CTL, BM_MECHA_INT_RESET);
     wait64dd_statusOFF(LEO_STAT_BUSY); //wait for 64DD to be ready
 
     io_write(ASIC_CMD, ASIC_READ_TIMER_MINUTE);	//request min and sec
@@ -45,4 +45,6 @@ void getRTC_64dd(void)
 
     min = (unsigned char)((temp & 0xFF000000) >> 24);
     sec = (unsigned char)((temp & 0x00FF0000) >> 16);
+
+    io_write(ASIC_BM_CTL, BM_MECHA_INT_RESET);
 }

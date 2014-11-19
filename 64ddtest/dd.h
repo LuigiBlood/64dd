@@ -83,11 +83,46 @@
 //RESET
 #define ASIC_RESET_CODE        0xaaaa0000
 
+//BM STATUS
+#define LEO_BMST_RUNNING       0x80000000 /* bit 15 */
+#define LEO_BMST_ERROR         0x04000000 /* bit 10 */
+#define LEO_BMST_MICRO_STATUS  0x02000000 /* bit  9 */
+#define LEO_BMST_BLOCKS        0x01000000 /* bit  8 */
+#define LEO_BMST_C1_CORRECT    0x00800000 /* bit  7 */
+#define LEO_BMST_C1_DOUBLE     0x00400000 /* bit  6 */
+#define LEO_BMST_C1_SINGLE     0x00200000 /* bit  5 */
+#define LEO_BMST_C1_ERROR      0x00010000 /* bit  0 */
+
+//BM CTL
+#define START_BM               0x80000000
+#define BM_MODE                0x40000000
+#define BM_INT_MASK            0x20000000
+#define BM_RESET               0x10000000
+#define BM_DISABLE_OR_CHK      0x08000000
+#define BM_DISABLE_C1          0x04000000
+#define BM_XFERBLKS            0x02000000
+#define BM_MECHA_INT_RESET     0x01000000
+
+//Secs
+#define USR_SECS_PER_BLK          85 /* Number of user sectors in a logical block */
+#define C2_SECS_PER_BLK            4 /* Number of C2 sectors in a logical block */
+#define GAP_SECS_PER_BLK           1 /* Number of GAP sectors in a logical block */
+#define HALF_SECS_U16         0x5900 /* Valid number of sectors in a logical block(excluding GAP)<<16*/ // Note, 89 decimal (0x59 !)
+
+#define ALL_SECS_PER_BLK         (USR_SECS_PER_BLK + C2_SECS_PER_BLK + GAP_SECS_PER_BLK)	// Note, 90 decimal (0x5A !)
+
 
 //functions
 int detect64dd_ipl(void);
 int detectdisk(void);
 void wait64dd_statusON(uint32_t STAT);
 void wait64dd_statusOFF(uint32_t STAT);
+uint32_t readDiskID(void);
+void BMReset(uint8_t sector);
+void StartBM(uint8_t sector);
+void sendMSEQ(uint32_t secsize);
+void readDiskSectorLBA(uint8_t LBA, uint8_t sector, void * buffer);
+void readDiskSector(uint8_t track, uint8_t sector, void * buffer);
+uint8_t getZonefromTrack(uint8_t track);
 
 #endif

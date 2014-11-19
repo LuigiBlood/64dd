@@ -10,6 +10,8 @@
 static resolution_t res = RESOLUTION_320x240;
 static bitdepth_t bit = DEPTH_32_BPP;
 
+char diskID[4];
+
 int detect_exppak(void)
 {
     io_write(0x00200000, 0xAAAA5555);
@@ -20,10 +22,18 @@ int detect_exppak(void)
 	return 0;
 }
 
+void emptydiskID(void)
+{
+    for (int i = 0; i < 4; i++)
+	diskID[i] = 0;
+}
+
 int main(void)
 {
     /* enable interrupts (on the CPU) */
     init_interrupts();
+
+    emptydiskID();
 
     /* Initialize peripherals */
     display_init( res, bit, 2, GAMMA_NONE, ANTIALIAS_RESAMPLE );
@@ -33,7 +43,7 @@ int main(void)
     console_set_render_mode(RENDER_MANUAL);
 
     console_clear();
-    printf("64dd_test2 by LuigiBlood\n\n");
+    printf("64dd_test3 by LuigiBlood & OzOnE\n\n");
     console_render();
 
     //64DD IPL test
@@ -54,7 +64,10 @@ int main(void)
 	//RESET 64DD
 	io_write(ASIC_HARD_RESET, ASIC_RESET_CODE);
 
-	wait64dd_statusON(LEO_STAT_RESET);
+	while ((io_read(ASIC_STATUS) & LEO_STAT_RESET) == LEO_STAT_RESET)
+	    io_write(ASIC_CMD, ASIC_CLR_RSTFLG); //clear reset flag
+
+	io_write(ASIC_BM_CTL, BM_MECHA_INT_RESET);
 
 	//get the date
 	getRTC_64dd();
@@ -68,7 +81,7 @@ int main(void)
         /* To do initialize routines */
         controller_scan();
 
-	printf("64dd_test2 by LuigiBlood\n\n");
+	printf("64dd_test3 by LuigiBlood & OzOnE\n\n");
 
 	switch (dd_present)
 	{
@@ -95,7 +108,7 @@ int main(void)
 	//DATE: MM/DD/YY - HH:MM:SS
 	if (dd_present)
 	{
-	    getRTC_64dd();
+	    //getRTC_64dd();
 	    printf("DATE: %02x/%02x/%02x - %02x:%02x:%02x\n\n", month, day, year, hour, min, sec);
 	}
 
@@ -103,21 +116,33 @@ int main(void)
 	if (dd_present != 0)
 	{
 		if (detectdisk() == 1)
-			printf("DISK FOUND\n\n");
+		{
+			printf("DISK FOUND\n");
+			printf("DISK ID: %c%c%c%c", diskID[0], diskID[1], diskID[2], diskID[3]);
+			printf(" (0x%02x%02x%02x%02x)\n", diskID[0], diskID[1], diskID[2], diskID[3]);
+		}
 		else
-			printf("DISK NOT FOUND\n\n");
+		{
+		    printf("DISK NOT FOUND\n");
+		}
 	}
+
 
 	//random controller test
         struct controller_data keys = get_keys_down();
 
         int controllers = get_controllers_present();
 
-        printf( "Controller 1 %spresent\n", (controllers & CONTROLLER_1_INSERTED) ? "" : "not " );
+        printf( "\nController 1 %spresent\n", (controllers & CONTROLLER_1_INSERTED) ? "" : "not " );
 
         if( keys.c[0].A )
         {
-            printf("YOU PRESSED A");
+            //printf("YOU PRESSED A");
+	    uint32_t idstuff = readDiskID();
+	    diskID[0] = (char)((idstuff & 0xFF000000) >> 24);
+	    diskID[1] = (char)((idstuff & 0x00FF0000) >> 16);
+	    diskID[2] = (char)((idstuff & 0x0000FF00) >> 8);
+	    diskID[3] = (char)((idstuff & 0x000000FF));
         }
 
         console_render();
