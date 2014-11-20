@@ -61,18 +61,12 @@ int detectdisk(void)
 
 void wait64dd_statusON(uint32_t STAT)
 {
-    while ((io_read(ASIC_STATUS) & STAT) != STAT)
-    {
-	//DO NOTHING. JUST WAIT.
-    }
+    while ((io_read(ASIC_STATUS) & STAT) != STAT);
 }
 
 void wait64dd_statusOFF(uint32_t STAT)
 {
-    while ((io_read(ASIC_STATUS) & STAT) == STAT)
-    {
-	//DO NOTHING. JUST WAIT.
-    }
+    while ((io_read(ASIC_STATUS) & STAT) == STAT);
 }
 
 uint32_t readDiskID(void)
@@ -133,12 +127,18 @@ void readDiskSector(uint8_t track, uint8_t sector, void * buffer)
     BMReset(sector);
     StartBM(sector);
 
+    printf("BM Check\n");
+    console_render();
     while ((io_read(ASIC_BM_STATUS) & LEO_BMST_RUNNING) == LEO_BMST_RUNNING);
 	//Wait until BM is done
 
+    printf("DATA REQ CHECK (can freeze)\n");
+    console_render();
+    wait64dd_statusON(LEO_STAT_DATA_REQ);
+
     if ((io_read(ASIC_BM_STATUS) & LEO_STAT_DATA_REQ) == LEO_STAT_DATA_REQ)
     {
-	printf("DMA !!!\n");
+	printf("DMA !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
 	console_render();
 	dma_read(buffer, (0xA0000000 | ASIC_SECTOR_BUFF), SecSize);
     }
