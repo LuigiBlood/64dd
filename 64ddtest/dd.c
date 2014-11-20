@@ -71,10 +71,12 @@ void wait64dd_statusOFF(uint32_t STAT)
 
 uint32_t readDiskID(void)
 {
-    uint32_t diskIDsector[60] __attribute__ ((aligned (8)));
+    uint32_t * diskIDsector = malloc(60 * sizeof(uint32_t));
     diskIDsector[0] = 0x12345678; //TEST
-    readDiskSectorLBA(14, 0, &diskIDsector);
-    return diskIDsector[0];
+    readDiskSectorLBA(14, 0, diskIDsector);
+    uint32_t diskIDs = *(uint32_t*)diskIDsector;
+    free(diskIDsector);
+    return diskIDs;
 }
 
 void BMReset(uint8_t sector) 
@@ -140,7 +142,8 @@ void readDiskSector(uint8_t track, uint8_t sector, void * buffer)
     {
 	printf("DMA !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
 	console_render();
-	dma_read(buffer, (0xA0000000 | ASIC_SECTOR_BUFF), SecSize);
+	//*(uint32_t*)buffer = io_read(ASIC_SECTOR_BUFF);
+	dma_read(buffer, ASIC_SECTOR_BUFF, 240);
     }
 }
 
