@@ -79,13 +79,13 @@ uint32_t readDiskID(void)
 
 void BMReset(uint8_t sector) 
 {
-    io_write(ASIC_BM_CTL, (BM_MODE | BM_RESET | (sector << 16)) );    // Set BM (Bit Micro?) Reset. Leave BM_MODE set.
-    io_write(ASIC_BM_CTL, (BM_MODE | (sector << 16)));  		   // Clear BM (Bit Micro?) reset. Leave BM_MODE set.
+    io_write(ASIC_BM_CTL, (BM_MODE | BM_RESET | ((uint32_t)sector << 16)) );    // Set BM (Bit Micro?) Reset. Leave BM_MODE set.
+    io_write(ASIC_BM_CTL, (BM_MODE | ((uint32_t)sector << 16)));  		   // Clear BM (Bit Micro?) reset. Leave BM_MODE set.
 }
 
 void StartBM(uint8_t sector) 
 {
-    io_write(ASIC_BM_CTL, (START_BM | BM_MODE | (sector << 16)));    // Set SECTOR offset (within the Track) depending on whether the LBA is Odd / Even.
+    io_write(ASIC_BM_CTL, (START_BM | BM_MODE | ((uint32_t)sector << 16)));    // Set SECTOR offset (within the Track) depending on whether the LBA is Odd / Even.
 }
 
 void sendMSEQ(uint32_t secsize)
@@ -132,11 +132,11 @@ void readDiskSector(uint8_t track, uint8_t sector, void * buffer)
     while ((io_read(ASIC_BM_STATUS) & LEO_BMST_RUNNING) == LEO_BMST_RUNNING);
 	//Wait until BM is done
 
-    printf("DATA REQ CHECK (can freeze)\n");
+    printf("DATA REQ CHECK\n");
     console_render();
-    wait64dd_statusON(LEO_STAT_DATA_REQ);
+    //wait64dd_statusON(LEO_STAT_DATA_REQ);
 
-    if ((io_read(ASIC_BM_STATUS) & LEO_STAT_DATA_REQ) == LEO_STAT_DATA_REQ)
+    if ((io_read(ASIC_STATUS) & LEO_STAT_DATA_REQ) == LEO_STAT_DATA_REQ)
     {
 	printf("DMA !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
 	console_render();
