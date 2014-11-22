@@ -25,6 +25,8 @@ const uint8_t Zones[] =
 	{0, 1, 2, 3, 4, 5, 6, 7, 8,
 	0, 1, 2, 3, 4, 5, 6, 7, 8};
 
+static unsigned int stat, bm_stat, err_stat = 0;
+
 int detect64dd_ipl(void)
 {
     //Look at 0x9FF00 from the IPL.
@@ -110,10 +112,16 @@ void readDiskSectorLBA(uint8_t LBA, uint8_t sector, void * buffer)
 void readDiskSector(uint8_t track, uint8_t sector, void * buffer)
 {
     //Read single sector
+    if (io_read(ASIC_STATUS) & LEO_STAT_MECHA_INT)
+	io_write(ASIC_BM_CTL, BM_MECHA_INT_RESET);
+
     io_write(ASIC_DATA, (uint32_t)(track << 16));	//Read Track (LBA >> 1)
     io_write(ASIC_CMD, ASIC_RD_SEEK);	//SEEK CMD
     io_write(ASIC_BM_CTL, 0x00000000);	//Clear BM CTL
     io_write(ASIC_SEQ_CTL, 0x00000000);	//Clear SEQ CTL
+
+    wait64dd_statusON(LEO_STAT_MECHA_INT);
+    //io_write(ASIC_BM_CTL, BM_MECHA_INT_RESET);
 
     if (getZonefromTrack(track) == 0xFF)
 	return;
@@ -124,27 +132,39 @@ void readDiskSector(uint8_t track, uint8_t sector, void * buffer)
     io_write(ASIC_HOST_SECBYTE, (SecSize << 16));
     io_write(ASIC_SEC_BYTE, (0x59000000 | ((SecSize + C1_Length) << 16)));
 
-    io_write(ASIC_SEQ_CTL, 0x40000000);	//MSEQ enable
+    io_write(ASIC_SEQ_CTL, MICRO_PC_ENABLE);	//MSEQ enable
 
     BMReset(sector);
     StartBM(sector);
 
     printf("BM Check\n");
     console_render();
+
+    wait64dd_statusON(LEO_STAT_BM_INT);
+
     while ((io_read(ASIC_BM_STATUS) & LEO_BMST_RUNNING) == LEO_BMST_RUNNING);
 	//Wait until BM is done
+    bm_stat = io_read(ASIC_BM_STATUS);
 
     printf("DATA REQ CHECK\n");
     console_render();
     //wait64dd_statusON(LEO_STAT_DATA_REQ);
 
-    if ((io_read(ASIC_STATUS) & LEO_STAT_DATA_REQ) == LEO_STAT_DATA_REQ)
+    stat = io_read(ASIC_STATUS);
+    if ((stat & LEO_STAT_DATA_REQ) == LEO_STAT_DATA_REQ)
     {
 	printf("DMA !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
 	console_render();
 	//*(uint32_t*)buffer = io_read(ASIC_SECTOR_BUFF);
 	dma_read(buffer, ASIC_SECTOR_BUFF, 240);
     }
+
+    err_stat = io_read(ASIC_ERR_SECTOR);
+}
+
+void PRINTSTAT(void)
+{
+    printf("\nASIC_STATUS:    0x%08x\nASIC_BM_STATUS: 0x%08x\nASIC_ERR_SECTOR: 0x%08x\n", stat, bm_stat, err_stat);
 }
 
 uint8_t getZonefromTrack(uint8_t track)

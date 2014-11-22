@@ -103,6 +103,20 @@
 #define BM_XFERBLKS            0x02000000
 #define BM_MECHA_INT_RESET     0x01000000
 
+//ERR SECTOR
+#define BIT_AM_FAIL            0x80000000
+#define BIT_MICRO_FAIL         0x40000000
+#define BIT_SPINDLE_FAIL       0x20000000
+#define BIT_OVER_RUN           0x10000000
+#define BIT_OFFTRACK           0x08000000
+#define BIT_NO_DISK            0x04000000
+#define BIT_CLOCK_UNLOCK       0x02000000
+#define BIT_SELF_STOP          0x01000000
+
+//SEQ CTL
+#define MICRO_INT_MASK         0x80000000
+#define MICRO_PC_ENABLE        0x40000000
+
 //Secs
 #define USR_SECS_PER_BLK          85 /* Number of user sectors in a logical block */
 #define C2_SECS_PER_BLK            4 /* Number of C2 sectors in a logical block */
@@ -123,6 +137,7 @@ void StartBM(uint8_t sector);
 void sendMSEQ(uint32_t secsize);
 void readDiskSectorLBA(uint8_t LBA, uint8_t sector, void * buffer);
 void readDiskSector(uint8_t track, uint8_t sector, void * buffer);
+void PRINTSTAT(void);
 uint8_t getZonefromTrack(uint8_t track);
 
 #endif
