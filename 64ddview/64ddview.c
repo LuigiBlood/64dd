@@ -5,7 +5,6 @@
 #include <libdragon.h>
 
 #include "dd.h"
-#include "dd_rtc.h"
 
 static resolution_t res = RESOLUTION_320x240;
 static bitdepth_t bit = DEPTH_32_BPP;

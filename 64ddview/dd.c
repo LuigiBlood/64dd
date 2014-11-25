@@ -128,7 +128,7 @@ void sendMSEQ(uint32_t secsize)
 
 void readDiskSectorLBA(uint16_t LBA, uint8_t sector, void * buffer)
 {
-    readDiskSector((LBA >> 1), (sector + (ALL_SECS_PER_BLK * (LBA & 1))), buffer);
+    readDiskSector((LBA >> 1), (sector + (ALL_SECS_PER_BLK * (((LBA & 2) >> 1) ^ (LBA & 1)))), buffer);
 }
 
 void readDiskSector(uint16_t track, uint8_t sector, void * buffer)
@@ -164,22 +164,21 @@ void readDiskSector(uint16_t track, uint8_t sector, void * buffer)
 
     wait64dd_statusON(LEO_STAT_BM_INT);
 
-    while ((io_read(ASIC_BM_STATUS) & LEO_BMST_RUNNING) == LEO_BMST_RUNNING);
+    //while ((io_read(ASIC_BM_STATUS) & LEO_BMST_RUNNING) == LEO_BMST_RUNNING);
 	//Wait until BM is done
-    bm_stat = io_read(ASIC_BM_STATUS);
 
     //printf("DATA REQ CHECK\n");
     //console_render();
 
-    stat = io_read(ASIC_STATUS);
-    if ((stat & LEO_STAT_DATA_REQ) == LEO_STAT_DATA_REQ)
+    if ((io_read(ASIC_STATUS) & LEO_STAT_DATA_REQ) == LEO_STAT_DATA_REQ)
     {
 	//printf("DMA !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
 	//console_render();
-	//*(uint32_t*)buffer = io_read(ASIC_SECTOR_BUFF);
-	dma_read(buffer, ASIC_SECTOR_BUFF, 240);
+	dma_read(buffer, ASIC_SECTOR_BUFF, (SecSize + 1));
     }
 
+    stat = io_read(ASIC_STATUS);
+    bm_stat = io_read(ASIC_BM_STATUS);
     err_stat = io_read(ASIC_ERR_SECTOR);
 }
 

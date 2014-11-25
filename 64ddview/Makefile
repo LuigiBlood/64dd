@@ -15,7 +15,7 @@ CC = $(GCCN64PREFIX)gcc
 AS = $(GCCN64PREFIX)as
 LD = $(GCCN64PREFIX)ld
 OBJCOPY = $(GCCN64PREFIX)objcopy
-OBJS = $(PROG_NAME).o dd.o dd_rtc.o
+OBJS = $(PROG_NAME).o dd.o
 
 
 $(PROG_NAME).v64: $(PROG_NAME).elf
