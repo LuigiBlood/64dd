@@ -17,7 +17,7 @@ int lbatobyte(int disktype, int nlbas, int startlba)
             if ((init_flag) || (VZONE_LBA_TBL[disktype][vzone] == lba))
             {
                 vzone = LBAToVZone(lba, disktype);
-                pzone = VZONE_PZONE_TBL[disktype][vzone];
+                pzone = VZoneToPZone(vzone, disktype);
                 if (7 < pzone)
                 {
                     pzone -= 7;

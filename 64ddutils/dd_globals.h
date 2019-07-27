@@ -2,9 +2,11 @@
 
 /* Sector Size in bytes [zone] */
 static unsigned char SECTOR_SIZES[] = {0xE8, 0xD8, 0xD0, 0xC0, 0xB0, 0xA0, 0x90, 0x80, 0x70};
+#define SECTOR_SIZE_ZONE0_DEV 0xC0
 
 /* Block Size in bytes [zone] */
 static unsigned short BLOCK_SIZES[] = {0x4D08, 0x47B8, 0x4510, 0x3FC0, 0x3A70, 0x3520, 0x2FD0, 0x2A80, 0x2530};
+#define BLOCK_SIZE_ZONE0_DEV 0x3FC0
 
 /* LBA to VZone [type][vzone] */
 static unsigned short VZONE_LBA_TBL[7][16] = {
@@ -40,6 +42,8 @@ static unsigned short OUTERCYL_TBL[] = {0x000, 0x09E, 0x13C, 0x1D1, 0x266, 0x2FB
 /* LBA Start RAM Area [type] */
 static unsigned short RAM_START_LBA[] = {0x5A2, 0x7C6, 0x9EA, 0xC0E, 0xE32, 0x1010, 0x10DC};
 
+#define LBA_DISK_CHECK 12
+
 static int LBAToVZone(int lba, int disktype) {
     for (int vzone = 0; vzone < 16; vzone++) {
         if (lba < VZONE_LBA_TBL[disktype][vzone]) {
@@ -47,3 +51,5 @@ static int LBAToVZone(int lba, int disktype) {
         }
     }
 };
+
+#define VZoneToPZone(x, y) VZONE_PZONE_TBL[y][x]
