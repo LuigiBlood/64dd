@@ -1,14 +1,15 @@
 #include <stdio.h>
 #include "dd_globals.h"
 
-int lbatophys(int lba, char* sys_data)
+int lbatophys(int lba, unsigned char* sys_data)
 {
     int start_block = 0;
     int vzone, pzone = 0;
     int param_head, param_zone, param_cylinder = 0;
-    int vzone_lba, cylinder, pzone_defect_num, defect_num = 0;
+    int vzone_lba, cylinder_temp, pzone_defect_num, defect_num = 0;
     
     int disktype = sys_data[5] & 0xF;
+    lba += 24;
 
     //Unused here
     if (((lba & 3) == 0) || ((lba & 3) == 3))
@@ -19,11 +20,7 @@ int lbatophys(int lba, char* sys_data)
     vzone = LBAToVZone(lba, disktype);
     pzone = VZoneToPZone(vzone, disktype);
 
-    if (7 < pzone)
-        param_head = 1;
-    else
-        param_head = 0;
-
+    param_head = (7 < pzone);
     param_zone = pzone;
     if (param_head != 0)
         param_zone = pzone - 7;
@@ -34,14 +31,12 @@ int lbatophys(int lba, char* sys_data)
         vzone_lba = VZONE_LBA_TBL[disktype][vzone - 1];
     
     param_cylinder = (lba - vzone_lba >> 1);
-    cylinder = SCYL_ZONE_TBL[0][param_zone];
-
+    cylinder_temp = SCYL_ZONE_TBL[0][pzone];
     if (param_head != 0)
     {
         param_cylinder = -param_cylinder;
-        cylinder = SCYL_ZONE_TBL[0][param_zone + 15];
+        cylinder_temp = OUTERCYL_TBL[param_zone - 15];
     }
-
     param_cylinder += SCYL_ZONE_TBL[0][pzone];
 
     if (pzone == 0)
@@ -50,7 +45,7 @@ int lbatophys(int lba, char* sys_data)
         pzone_defect_num = sys_data[7 + pzone];
     
     defect_num = sys_data[8 + pzone] - pzone_defect_num;
-    while ((defect_num != 0) && ((sys_data[0x20 + pzone_defect_num] + cylinder) <= param_cylinder))
+    while ((defect_num != 0) && ((sys_data[0x20 + pzone_defect_num] + cylinder_temp) <= param_cylinder))
     {
         param_cylinder++;
         pzone_defect_num++;
@@ -63,7 +58,7 @@ int lbatophys(int lba, char* sys_data)
 int main(int argc, char const *argv[])
 {
     FILE *pFile;
-    char* sys_data;
+    unsigned char* sys_data;
     int lba = 0;
     if (argc < 3)
     {
@@ -79,7 +74,7 @@ int main(int argc, char const *argv[])
         if (pFile == NULL)
             return 1;
         
-        sys_data = (char*)malloc(sizeof(char)*0xE8);
+        sys_data = (unsigned char*)malloc(sizeof(unsigned char)*0xE8);
         if (sys_data == NULL)
             return 1;
         
