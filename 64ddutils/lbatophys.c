@@ -6,7 +6,7 @@ int lbatophys(int lba, unsigned char* sys_data)
     int start_block = 0;
     int vzone, pzone = 0;
     int param_head, param_zone, param_cylinder = 0;
-    int vzone_lba, cylinder_zone_start, pzone_defect_offset, defect_amount = 0;
+    int vzone_lba, cylinder_zone_start, defect_offset, defect_amount = 0;
     
     int disktype = sys_data[5] & 0xF;
 
@@ -52,18 +52,18 @@ int lbatophys(int lba, unsigned char* sys_data)
 
     //Get the relative offset to defect tracks for the current zone (if Zone 0, then it's 0)
     if (pzone == 0)
-        pzone_defect_offset = 0;
+        defect_offset = 0;
     else
-        pzone_defect_offset = sys_data[8 + pzone - 1];
+        defect_offset = sys_data[8 + pzone - 1];
     
     //Get amount of defect tracks for the current zone
-    defect_amount = sys_data[8 + pzone] - pzone_defect_offset;
+    defect_amount = sys_data[8 + pzone] - defect_offset;
 
     //Skip defect tracks
-    while ((defect_amount != 0) && ((sys_data[0x20 + pzone_defect_offset] + cylinder_zone_start) <= param_cylinder))
+    while ((defect_amount != 0) && ((sys_data[0x20 + defect_offset] + cylinder_zone_start) <= param_cylinder))
     {
         param_cylinder++;
-        pzone_defect_offset++;
+        defect_offset++;
         defect_amount--;
     }
 
