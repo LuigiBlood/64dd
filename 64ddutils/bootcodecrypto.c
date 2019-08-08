@@ -4,7 +4,7 @@
 
 void decrypt(unsigned char* enc, unsigned char* dec)
 {
-    int i, t, s = 0;
+    int i, t = 0;
     for (i = 0; i < 0x100; i++)
     {
         t = (i * 0x11) & 0xFF;
@@ -14,7 +14,7 @@ void decrypt(unsigned char* enc, unsigned char* dec)
 
 void encrypt(unsigned char* dec, unsigned char* enc)
 {
-    int i, t, s = 0;
+    int i, t = 0;
     for (i = 0; i < 0x100; i++)
     {
         t = (i * 0x11) & 0xFF;
