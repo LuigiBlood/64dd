@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include "dd_globals.h"
 
-int lbatobyte(int disktype, int nbytes, int startlba)
+int bytetolba(int disktype, int nbytes, int startlba)
 {
     char init_flag = 1;
     int vzone = 1;
@@ -62,7 +62,7 @@ int main(int argc, char const *argv[])
         if (sscanf(argv[3], "%d", &startlba) <= 0)
             return 1;
         
-        printf("%d\n", lbatobyte(disktype, nbytes, startlba));
+        printf("%d\n", bytetolba(disktype, nbytes, startlba));
     }
     return 0;
 }
